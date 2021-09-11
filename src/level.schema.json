@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Direction": {
+            "enum": [
+                "D",
+                "L",
+                "R",
+                "U"
+            ],
+            "type": "string"
+        },
+        "Dragon": {
+            "properties": {
+                "direction": {
+                    "$ref": "#/definitions/Direction"
+                },
+                "position": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "GadgetToolbox": {
+            "properties": {
+                "DOWNARROW": {
+                    "type": "number"
+                },
+                "EMPTY": {
+                    "type": "number"
+                },
+                "LEFTARROW": {
+                    "type": "number"
+                },
+                "RIGHTARROW": {
+                    "type": "number"
+                },
+                "UPARROW": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "board": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[0-9]+$": {
+                    "enum": [
+                        "DOWNARROW",
+                        "EMPTY",
+                        "LEFTARROW",
+                        "RIGHTARROW",
+                        "UPARROW"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "dragon": {
+            "$ref": "#/definitions/Dragon"
+        },
+        "height": {
+            "type": "number"
+        },
+        "toolbox": {
+            "$ref": "#/definitions/GadgetToolbox"
+        },
+        "width": {
+            "type": "number"
+        }
+    },
+    "type": "object"
+}
+

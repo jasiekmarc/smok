@@ -1,0 +1,12 @@
+{
+    "width": 4,
+    "height": 4,
+    "dragon": {"position": 5, "direction": "R"},
+    "toolbox": {
+        "LEFTARROW": 1,
+        "UPARROW": 1,
+        "RIGHTARROW": 1,
+        "DOWNARROW": 1
+    },
+    "board": {}
+}
