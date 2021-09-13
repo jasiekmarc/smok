@@ -6,8 +6,7 @@
 </template>
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Watch } from "vue-property-decorator";
-import { Gadget, GadgetToolbox, Level } from "../level";
+import { Gadget, GadgetToolbox, Level } from "@/level";
 import Field from "./Field.vue";
 
 // Represents a single field;
@@ -24,6 +23,11 @@ type FieldType = {
   components: {
     Field,
   },
+  watch: {
+    level: function () {
+      this.populateLevel();
+    },
+  },
 })
 export default class Board extends Vue {
   level!: Level | undefined;
@@ -37,12 +41,13 @@ export default class Board extends Vue {
     return this.level.width * this.level.height;
   }
 
-  mounted() {
+  mounted(): void {
     this.populateLevel();
   }
 
-  @Watch("level")
-  populateLevel() {
+  // Scans the level prop and builds a new board. Triggered everytime `level`
+  // changes.
+  populateLevel(): void {
     console.log(this.level);
     if (this.level === undefined) {
       return;
@@ -59,7 +64,7 @@ export default class Board extends Vue {
 
     const positions = Object.keys(this.level.board).map(Number);
     positions.map((p) => {
-      fields[p].gadget = this.level!.board[p];
+      fields[p].gadget = this.level?.board[p] || "EMPTY";
     });
     this.fields = fields;
 

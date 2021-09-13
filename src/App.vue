@@ -18,7 +18,7 @@ import levelSchema from "./level.schema.json";
 })
 export default class App extends Vue {
   level: Level | undefined = undefined;
-  beforeMount() {
+  beforeMount(): void {
     const ajv = new Ajv();
     const validate = ajv.compile(levelSchema);
     const valid = validate(exampleLevel);
