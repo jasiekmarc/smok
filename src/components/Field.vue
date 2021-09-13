@@ -33,7 +33,9 @@ export default class Field extends Vue {
     if (gadgetDirection(this.gadget) !== undefined) {
       classes.push(`rotate-${gadgetDirection(this.gadget)}`);
     }
-    console.log(classes);
+    if (this.availability !== undefined && this.availability > 0) {
+      classes.push("available");
+    }
     return classes;
   }
 }
@@ -58,10 +60,10 @@ export default class Field extends Vue {
   &::before {
     display: inline-block;
   }
+}
 
-  &:hover {
-    background: var(--primary-dark);
-  }
+.available:hover {
+  background: var(--primary-dark);
 }
 
 .dragon {

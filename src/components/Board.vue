@@ -6,16 +6,22 @@
     <Field
       v-for="(field, i) in fields"
       :key="i"
+      :id="i"
       :gadget="field.gadget"
       :dragon="dragon(i)"
+      @drop="onToolDrop"
+      @dragover.prevent
     />
   </div>
   <div class="toolbox">
     <Field
       v-for="(t, i) in tools"
       :key="i"
+      :id="t.gadget"
       :gadget="t.gadget"
       :availability="t.availability"
+      :draggable="t.availability > 0"
+      @dragstart="onToolDragStart"
     />
   </div>
 </template>
@@ -76,13 +82,14 @@ export default class Board extends Vue {
     for (let i = 0; i < this.size; i++) {
       fields[i] = {
         gadget: "EMPTY",
-        initial: true,
+        initial: false,
       };
     }
 
     const positions = Object.keys(this.level.board).map(Number);
     positions.map((p) => {
       fields[p].gadget = this.level?.board[p] || "EMPTY";
+      fields[p].initial = true;
     });
     this.fields = fields;
 
@@ -99,6 +106,7 @@ export default class Board extends Vue {
     return this.level.dragon;
   }
 
+  // Current state of the toolbox.
   get tools(): ToolType[] {
     return Object.entries(this.toolbox).map(([g, a]) => {
       return {
@@ -106,6 +114,35 @@ export default class Board extends Vue {
         availability: a as number,
       };
     });
+  }
+
+  // Triggered when a tool is lifted up from a toolbox.
+  onToolDragStart(event: DragEvent): void {
+    event.dataTransfer?.setData("text/plain", (event.target as HTMLElement).id);
+  }
+
+  // Triggered when a tool is dropped onto the board.
+  onToolDrop(event: DragEvent): void {
+    console.log(event);
+    const tool = event.dataTransfer?.getData("text");
+    if (tool === undefined) {
+      return;
+    }
+    const fieldNum = Number(((event.target as Element).closest('.field') as Element).id);
+    if (this.fields[fieldNum].initial) {
+      // An initial gadget cannot be removed.
+      return;
+    }
+    // Move the current gadget to the toolbox.
+    const currentGadget = this.fields[fieldNum].gadget;
+    if (this.toolbox[currentGadget] === undefined) {
+      this.toolbox[currentGadget] = 1;
+    }
+    (this.toolbox[currentGadget] as number) += 1;
+    // Move the tool to the field.
+    this.fields[fieldNum].gadget = tool as Gadget;
+    // Remove it from the toolbox.
+    (this.toolbox[tool as Gadget] as number) -= 1;
   }
 }
 </script>
