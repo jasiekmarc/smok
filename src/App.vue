@@ -1,5 +1,4 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
   <Board :level="level" />
 </template>
 
@@ -32,6 +31,15 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+html {
+  --primary: #dcedc8;
+  --primary-dark: #aabb97;
+  --primary-light: #fffffb;
+  --secondary: #f8bbd0;
+  --secondary-dark: #c48b9f;
+  --secondary-light: #ffeeff;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

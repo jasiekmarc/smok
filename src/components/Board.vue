@@ -1,12 +1,27 @@
 <template>
-  <div class="board">
-    <Field v-for="(field, i) in fields" :key="i" />
+  <div
+    class="board"
+    :style="{ gridTemplateColumns: 'repeat(' + level.width + ', 100px)' }"
+  >
+    <Field
+      v-for="(field, i) in fields"
+      :key="i"
+      :gadget="field.gadget"
+      :dragon="dragon(i)"
+    />
   </div>
-  <div class="toolbox"></div>
+  <div class="toolbox">
+    <Field
+      v-for="(t, i) in tools"
+      :key="i"
+      :gadget="t.gadget"
+      :availability="t.availability"
+    />
+  </div>
 </template>
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Gadget, GadgetToolbox, Level } from "@/level";
+import { Gadget, GadgetToolbox, Level, Dragon } from "@/level";
 import Field from "./Field.vue";
 
 // Represents a single field;
@@ -14,6 +29,11 @@ type FieldType = {
   gadget: Gadget;
   // Gadget cannot be erased/replaced if it is initial.
   initial: boolean;
+};
+
+type ToolType = {
+  gadget: Gadget;
+  availability: number;
 };
 
 @Options({
@@ -48,11 +68,9 @@ export default class Board extends Vue {
   // Scans the level prop and builds a new board. Triggered everytime `level`
   // changes.
   populateLevel(): void {
-    console.log(this.level);
     if (this.level === undefined) {
       return;
     }
-    console.log(this.size);
     // Populate fields with initial gadgets from the level.
     let fields = new Array<FieldType>(this.size);
     for (let i = 0; i < this.size; i++) {
@@ -72,5 +90,40 @@ export default class Board extends Vue {
     this.toolbox = Object.assign({}, this.level.toolbox);
     this.toolbox["EMPTY"] = 0;
   }
+
+  // Passes the dragon to the correct field cell.
+  dragon(position: number): Dragon | undefined {
+    if (this.level?.dragon.position !== position) {
+      return undefined;
+    }
+    return this.level.dragon;
+  }
+
+  get tools(): ToolType[] {
+    return Object.entries(this.toolbox).map(([g, a]) => {
+      return {
+        gadget: g as Gadget,
+        availability: a as number,
+      };
+    });
+  }
 }
 </script>
+<style lang="scss" scoped>
+.board {
+  display: grid;
+  gap: 5px;
+  place-items: stretch;
+  place-content: center;
+  grid-auto-rows: 100px;
+}
+
+.toolbox {
+  margin: 5em auto;
+  max-width: min(768px, 90vh);
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(auto-fit, 100px);
+  justify-content: center;
+}
+</style>
