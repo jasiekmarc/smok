@@ -13,6 +13,8 @@
       @dragover.prevent
     />
   </div>
+  <button @click.prevent="startGame" v-if="ticker === undefined">▶</button>
+  <button @click.prevent="haltGame" v-else>■</button>
   <div class="toolbox">
     <Field
       v-for="(t, i) in tools"
@@ -26,8 +28,10 @@
   </div>
 </template>
 <script lang="ts">
+import { move, State } from "@/game";
+import { Dragon, Gadget, GadgetToolbox, Level } from "@/level";
 import { Options, Vue } from "vue-class-component";
-import { Gadget, GadgetToolbox, Level, Dragon } from "@/level";
+import { reactive } from "vue";
 import Field from "./Field.vue";
 
 // Represents a single field;
@@ -59,6 +63,8 @@ export default class Board extends Vue {
   level!: Level | undefined;
   fields: FieldType[] = [];
   toolbox: GadgetToolbox = {};
+  state: State | undefined = undefined;
+  ticker: number | undefined = undefined;
 
   get size(): number {
     if (this.level === undefined) {
@@ -96,14 +102,17 @@ export default class Board extends Vue {
     // Copy the original toolbox into ours.
     this.toolbox = Object.assign({}, this.level.toolbox);
     this.toolbox["EMPTY"] = 0;
+
+    // Copy the initial position of the dragon.
+    this.state = reactive({ dragon: Object.assign({}, this.level.dragon) });
   }
 
   // Passes the dragon to the correct field cell.
   dragon(position: number): Dragon | undefined {
-    if (this.level?.dragon.position !== position) {
+    if (this.state === undefined || this.state.dragon.position !== position) {
       return undefined;
     }
-    return this.level.dragon;
+    return this.state.dragon;
   }
 
   // Current state of the toolbox.
@@ -123,12 +132,13 @@ export default class Board extends Vue {
 
   // Triggered when a tool is dropped onto the board.
   onToolDrop(event: DragEvent): void {
-    console.log(event);
     const tool = event.dataTransfer?.getData("text");
     if (tool === undefined) {
       return;
     }
-    const fieldNum = Number(((event.target as Element).closest('.field') as Element).id);
+    const fieldNum = Number(
+      ((event.target as Element).closest(".field") as Element).id
+    );
     if (this.fields[fieldNum].initial) {
       // An initial gadget cannot be removed.
       return;
@@ -144,6 +154,32 @@ export default class Board extends Vue {
     // Remove it from the toolbox.
     (this.toolbox[tool as Gadget] as number) -= 1;
   }
+
+  // Starts the interval with game moves.
+  startGame(): void {
+    this.ticker = setInterval(() => {
+      if (
+        !move(
+          this.state as State,
+          this.level as Level,
+          this.fields[(this.state as State).dragon.position].gadget
+        )
+      ) {
+        this.stopGame();
+      }
+    }, 500);
+  }
+
+  // Stops/pauses the game.
+  stopGame(): void {
+    clearInterval(this.ticker);
+  }
+
+  haltGame(): void {
+    clearInterval(this.ticker);
+    this.ticker = undefined;
+    (this.state as State).dragon = Object.assign({}, this.level?.dragon);
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -155,8 +191,20 @@ export default class Board extends Vue {
   grid-auto-rows: 100px;
 }
 
+button {
+  margin: 0.5em auto;
+  padding: 10px 30px;
+  border-radius: 15px;
+  border: 5px solid var(--primary-light);
+  background: var(--primary-dark);
+  font-size: 30px;
+  &:hover {
+    opacity: 70%;
+  }
+}
+
 .toolbox {
-  margin: 5em auto;
+  margin: 1em auto;
   max-width: min(768px, 90vh);
   display: grid;
   gap: 5px;
