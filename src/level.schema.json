@@ -29,6 +29,9 @@
                 "EMPTY": {
                     "type": "number"
                 },
+                "FINISH": {
+                    "type": "number"
+                },
                 "LEFTARROW": {
                     "type": "number"
                 },
@@ -50,6 +53,7 @@
                     "enum": [
                         "DOWNARROW",
                         "EMPTY",
+                        "FINISH",
                         "LEFTARROW",
                         "RIGHTARROW",
                         "UPARROW"

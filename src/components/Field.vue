@@ -91,6 +91,10 @@ export default class Field extends Vue {
   content: "";
 }
 
+.finish::before {
+  content: "🏁";
+}
+
 .rotate-R::before {
   transform: scaleX(-1);
 }

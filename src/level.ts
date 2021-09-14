@@ -12,13 +12,14 @@ export interface Arrow {
   direction: Direction;
 }
 
-export type GadgetType = "ARROW" | "EMPTY";
+export type GadgetType = "ARROW" | "EMPTY" | "FINISH";
 export type Gadget =
   | "UPARROW"
   | "RIGHTARROW"
   | "DOWNARROW"
   | "LEFTARROW"
-  | "EMPTY";
+  | "EMPTY"
+  | "FINISH";
 
 export function gadgetType(gadget: Gadget): GadgetType {
   switch (gadget) {
@@ -29,6 +30,8 @@ export function gadgetType(gadget: Gadget): GadgetType {
       return "ARROW";
     case "EMPTY":
       return "EMPTY";
+    case "FINISH":
+      return "FINISH";
   }
 }
 

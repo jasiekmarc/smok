@@ -17,6 +17,9 @@ export function move(state: State, level: Level, gadget: Gadget): boolean {
     state.dragon.direction = gadgetDirection(gadget) as Direction;
   }
   // Check if the dragon may be moved.
+  if (gadgetType(gadget) == "FINISH") {
+    return false;
+  }
   let posX = state.dragon.position % level.width;
   let posY = Math.trunc(state.dragon.position / level.width);
   switch (state.dragon.direction) {
