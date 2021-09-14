@@ -9,11 +9,11 @@
     "DOWNARROW": 2
   },
   "board": {
-    "4": { "gadget": "RSCALE" },
-    "8": { "gadget": "BASKET", "attributes": { "colour": "R", "count": 1 } },
+    "4": { "gadget": "YSCALE" },
+    "8": { "gadget": "BASKET", "attributes": { "colour": "Y", "count": 1 } },
     "14": { "gadget": "FINISH" }
   },
   "goal": {
-    "R": 2
+    "Y": 2
   }
 }

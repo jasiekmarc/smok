@@ -7,7 +7,7 @@
       v-for="(field, i) in fields"
       :key="i"
       :id="i"
-      :gadget="field.gadget"
+      :field="field"
       :state="state"
       @drop="onToolDrop"
       @dragover.prevent
@@ -20,8 +20,7 @@
       v-for="(t, i) in tools"
       :key="i"
       :data-tool="t.gadget"
-      :gadget="t.gadget"
-      :availability="t.availability"
+      :field="t"
       :draggable="t.availability > 0"
       @dragstart="onToolDragStart"
     />
@@ -29,21 +28,10 @@
 </template>
 <script lang="ts">
 import { move, State } from "@/game";
-import { Gadget, GadgetInfo, GadgetToolbox, Level } from "@/level";
+import { Gadget, GadgetToolbox, Level } from "@/level";
 import { Options, Vue } from "vue-class-component";
 import { reactive } from "vue";
-import Field from "./Field.vue";
-
-// Represents a single field;
-interface FieldType extends GadgetInfo {
-  // Gadget cannot be erased/replaced if it is initial.
-  initial: boolean;
-}
-
-type ToolType = {
-  gadget: Gadget;
-  availability: number;
-};
+import Field, { FieldType, ToolType } from "./Field.vue";
 
 @Options({
   props: {
@@ -89,12 +77,15 @@ export default class Board extends Vue {
       fields[i] = {
         gadget: "EMPTY",
         initial: false,
-      };
+      } as FieldType;
     }
 
     const positions = Object.keys(this.level.board).map(Number);
     positions.map((p) => {
-      fields[p] = Object.assign({ initial: true }, this.level?.board[p]);
+      fields[p] = Object.assign(
+        { initial: true },
+        this.level?.board[p]
+      ) as FieldType;
     });
     this.fields = fields;
 
@@ -116,7 +107,7 @@ export default class Board extends Vue {
       return {
         gadget: g as Gadget,
         availability: a as number,
-      };
+      } as ToolType;
     });
   }
 
