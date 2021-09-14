@@ -1,9 +1,9 @@
 <template>
-  <div class="field" :class="classList">
+  <div class="field" :class="classList" :data-fieldnum="id">
     <span
       class="dragon"
-      v-if="dragon !== undefined"
-      :class="`rotate-${dragon.direction}`"
+      v-if="hasDragon"
+      :class="`rotate-${state.dragon.direction}`"
     ></span>
     <span class="availability" v-if="availability !== undefined">{{
       availability
@@ -11,19 +11,23 @@
   </div>
 </template>
 <script lang="ts">
-import { Dragon, Gadget, gadgetDirection, gadgetType } from "@/level";
+import { State } from "@/game";
+import { Gadget, gadgetDirection, gadgetType } from "@/level";
 import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {
     gadget: String,
+    state: Object,
     dragon: Object,
+    id: Number,
     availability: Number,
   },
 })
 export default class Field extends Vue {
   gadget!: Gadget;
-  dragon!: Dragon | undefined;
+  state!: State | undefined;
+  id!: number | undefined;
   availability!: number | undefined;
 
   get classList(): string[] {
@@ -36,7 +40,17 @@ export default class Field extends Vue {
     if (this.availability !== undefined && this.availability > 0) {
       classes.push("available");
     }
+    if (this.gadget === "FINISH" && !this.state?.gateOpen) {
+      classes.push("closed");
+    }
     return classes;
+  }
+
+  get hasDragon(): boolean {
+    if (this.state === undefined || this.id === undefined) {
+      return false;
+    }
+    return this.state?.dragon.position === this.id;
   }
 }
 </script>
@@ -92,7 +106,19 @@ export default class Field extends Vue {
 }
 
 .finish::before {
-  content: "🏁";
+  content: "🕳️";
+}
+
+.closed.finish::before {
+  opacity: 20%;
+}
+
+.scale::before {
+  content: "⚖️";
+}
+
+.basket::before {
+  content: "🧺";
 }
 
 .rotate-R::before {

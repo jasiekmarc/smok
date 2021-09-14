@@ -6,9 +6,14 @@
     "LEFTARROW": 1,
     "UPARROW": 1,
     "RIGHTARROW": 1,
-    "DOWNARROW": 1
+    "DOWNARROW": 2
   },
   "board": {
-    "14": "FINISH"
+    "4": { "gadget": "RSCALE" },
+    "8": { "gadget": "BASKET", "attributes": { "colour": "R", "count": 1 } },
+    "14": { "gadget": "FINISH" }
+  },
+  "goal": {
+    "R": 2
   }
 }

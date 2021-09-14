@@ -8,7 +8,7 @@
       :key="i"
       :id="i"
       :gadget="field.gadget"
-      :dragon="dragon(i)"
+      :state="state"
       @drop="onToolDrop"
       @dragover.prevent
     />
@@ -19,7 +19,7 @@
     <Field
       v-for="(t, i) in tools"
       :key="i"
-      :id="t.gadget"
+      :data-tool="t.gadget"
       :gadget="t.gadget"
       :availability="t.availability"
       :draggable="t.availability > 0"
@@ -29,17 +29,16 @@
 </template>
 <script lang="ts">
 import { move, State } from "@/game";
-import { Dragon, Gadget, GadgetToolbox, Level } from "@/level";
+import { Gadget, GadgetInfo, GadgetToolbox, Level } from "@/level";
 import { Options, Vue } from "vue-class-component";
 import { reactive } from "vue";
 import Field from "./Field.vue";
 
 // Represents a single field;
-type FieldType = {
-  gadget: Gadget;
+interface FieldType extends GadgetInfo {
   // Gadget cannot be erased/replaced if it is initial.
   initial: boolean;
-};
+}
 
 type ToolType = {
   gadget: Gadget;
@@ -64,7 +63,7 @@ export default class Board extends Vue {
   fields: FieldType[] = [];
   toolbox: GadgetToolbox = {};
   state: State | undefined = undefined;
-  ticker: number | undefined = undefined;
+  ticker: number | undefined = 0;
 
   get size(): number {
     if (this.level === undefined) {
@@ -75,6 +74,7 @@ export default class Board extends Vue {
 
   mounted(): void {
     this.populateLevel();
+    this.ticker = undefined;
   }
 
   // Scans the level prop and builds a new board. Triggered everytime `level`
@@ -94,8 +94,7 @@ export default class Board extends Vue {
 
     const positions = Object.keys(this.level.board).map(Number);
     positions.map((p) => {
-      fields[p].gadget = this.level?.board[p] || "EMPTY";
-      fields[p].initial = true;
+      fields[p] = Object.assign({ initial: true }, this.level?.board[p]);
     });
     this.fields = fields;
 
@@ -104,15 +103,11 @@ export default class Board extends Vue {
     this.toolbox["EMPTY"] = 0;
 
     // Copy the initial position of the dragon.
-    this.state = reactive({ dragon: Object.assign({}, this.level.dragon) });
-  }
-
-  // Passes the dragon to the correct field cell.
-  dragon(position: number): Dragon | undefined {
-    if (this.state === undefined || this.state.dragon.position !== position) {
-      return undefined;
-    }
-    return this.state.dragon;
+    this.state = reactive({
+      dragon: Object.assign({}, this.level.dragon),
+      balance: {},
+      gateOpen: true,
+    });
   }
 
   // Current state of the toolbox.
@@ -127,7 +122,12 @@ export default class Board extends Vue {
 
   // Triggered when a tool is lifted up from a toolbox.
   onToolDragStart(event: DragEvent): void {
-    event.dataTransfer?.setData("text/plain", (event.target as HTMLElement).id);
+    const sourceElement = event.target as HTMLElement;
+    const tool = sourceElement.dataset["tool"];
+    if (tool === undefined) {
+      return;
+    }
+    event.dataTransfer?.setData("text/plain", tool);
   }
 
   // Triggered when a tool is dropped onto the board.
@@ -136,9 +136,10 @@ export default class Board extends Vue {
     if (tool === undefined) {
       return;
     }
-    const fieldNum = Number(
-      ((event.target as Element).closest(".field") as Element).id
-    );
+    const dropElement = (event.target as Element).closest(
+      ".field"
+    ) as HTMLElement;
+    const fieldNum = Number(dropElement.dataset["fieldnum"]);
     if (this.fields[fieldNum].initial) {
       // An initial gadget cannot be removed.
       return;
@@ -162,7 +163,7 @@ export default class Board extends Vue {
         !move(
           this.state as State,
           this.level as Level,
-          this.fields[(this.state as State).dragon.position].gadget
+          this.fields[(this.state as State).dragon.position]
         )
       ) {
         this.stopGame();

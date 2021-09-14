@@ -12,6 +12,9 @@
         },
         "Dragon": {
             "properties": {
+                "balance": {
+                    "$ref": "#/definitions/GemBalance"
+                },
                 "direction": {
                     "$ref": "#/definitions/Direction"
                 },
@@ -21,8 +24,31 @@
             },
             "type": "object"
         },
+        "Gadget": {
+            "enum": [
+                "BASKET",
+                "BSCALE",
+                "DOWNARROW",
+                "EMPTY",
+                "FINISH",
+                "GSCALE",
+                "KSCALE",
+                "LEFTARROW",
+                "RIGHTARROW",
+                "RSCALE",
+                "UPARROW",
+                "YSCALE"
+            ],
+            "type": "string"
+        },
         "GadgetToolbox": {
             "properties": {
+                "BASKET": {
+                    "type": "number"
+                },
+                "BSCALE": {
+                    "type": "number"
+                },
                 "DOWNARROW": {
                     "type": "number"
                 },
@@ -32,17 +58,59 @@
                 "FINISH": {
                     "type": "number"
                 },
+                "GSCALE": {
+                    "type": "number"
+                },
+                "KSCALE": {
+                    "type": "number"
+                },
                 "LEFTARROW": {
                     "type": "number"
                 },
                 "RIGHTARROW": {
                     "type": "number"
                 },
+                "RSCALE": {
+                    "type": "number"
+                },
                 "UPARROW": {
+                    "type": "number"
+                },
+                "YSCALE": {
                     "type": "number"
                 }
             },
             "type": "object"
+        },
+        "GemBalance": {
+            "properties": {
+                "B": {
+                    "type": "number"
+                },
+                "G": {
+                    "type": "number"
+                },
+                "K": {
+                    "type": "number"
+                },
+                "R": {
+                    "type": "number"
+                },
+                "Y": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "GemColour": {
+            "enum": [
+                "B",
+                "G",
+                "K",
+                "R",
+                "Y"
+            ],
+            "type": "string"
         }
     },
     "properties": {
@@ -50,21 +118,46 @@
             "additionalProperties": false,
             "patternProperties": {
                 "^[0-9]+$": {
-                    "enum": [
-                        "DOWNARROW",
-                        "EMPTY",
-                        "FINISH",
-                        "LEFTARROW",
-                        "RIGHTARROW",
-                        "UPARROW"
-                    ],
-                    "type": "string"
+                    "properties": {
+                        "attributes": {
+                            "properties": {
+                                "colour": {
+                                    "$ref": "#/definitions/GemColour"
+                                },
+                                "count": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "B",
+                                                "G",
+                                                "K",
+                                                "R",
+                                                "Y"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "number"
+                                        }
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "gadget": {
+                            "$ref": "#/definitions/Gadget"
+                        }
+                    },
+                    "type": "object"
                 }
             },
             "type": "object"
         },
         "dragon": {
             "$ref": "#/definitions/Dragon"
+        },
+        "goal": {
+            "$ref": "#/definitions/GemBalance"
         },
         "height": {
             "type": "number"

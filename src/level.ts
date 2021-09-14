@@ -7,19 +7,37 @@
 // >  npx typescript-json-schema "src/level.ts" Level > src/level.schema.json
 
 export type Direction = "U" | "R" | "D" | "L";
+export type GemColour = "G" | "Y" | "K" | "R" | "B";
 
 export interface Arrow {
   direction: Direction;
 }
 
-export type GadgetType = "ARROW" | "EMPTY" | "FINISH";
+export type GadgetType = "ARROW" | "EMPTY" | "SCALE" | "BASKET" | "FINISH";
 export type Gadget =
   | "UPARROW"
   | "RIGHTARROW"
   | "DOWNARROW"
   | "LEFTARROW"
   | "EMPTY"
+  | "GSCALE"
+  | "YSCALE"
+  | "KSCALE"
+  | "RSCALE"
+  | "BSCALE"
+  | "BASKET"
   | "FINISH";
+
+// The player may select how many gems and of which colour the basket gives on
+// every visit.
+export type BasketAttributes = {
+  colour: GemColour;
+  // Basket may either give a specific number of gems or the same amount as
+  // dragon has some of other gems.
+  count: number | GemColour;
+};
+
+export type GadgetAttributes = BasketAttributes;
 
 export function gadgetType(gadget: Gadget): GadgetType {
   switch (gadget) {
@@ -28,6 +46,14 @@ export function gadgetType(gadget: Gadget): GadgetType {
     case "DOWNARROW":
     case "LEFTARROW":
       return "ARROW";
+    case "GSCALE":
+    case "YSCALE":
+    case "KSCALE":
+    case "RSCALE":
+    case "BSCALE":
+      return "SCALE";
+    case "BASKET":
+      return "BASKET";
     case "EMPTY":
       return "EMPTY";
     case "FINISH":
@@ -49,18 +75,43 @@ export function gadgetDirection(gadget: Gadget): Direction | undefined {
   return undefined;
 }
 
+export function gadgetColourOut(gadget: Gadget): GemColour | undefined {
+  switch (gadget) {
+    case "GSCALE":
+      return "G";
+    case "YSCALE":
+      return "Y";
+    case "KSCALE":
+      return "K";
+    case "RSCALE":
+      return "R";
+    case "BSCALE":
+      return "B";
+  }
+  return undefined;
+}
+
+export type GadgetInfo = {
+  gadget: Gadget;
+  attributes?: GadgetAttributes;
+};
+
 // Gadget is an object that can be placed onto a field. GadgetOnBoard represents
 // its placement.
-export type GadgetsOnBoard = { [position: number]: Gadget };
+export type GadgetsOnBoard = { [position: number]: GadgetInfo };
 
 // Provides availability for different gadgets.
 export type GadgetToolbox = { [index in Gadget]?: number };
+
+// Stores the state of gems.
+export type GemBalance = { [index in GemColour]?: number };
 
 // The position of the dragon on the board is the main component of the state of
 // the game.
 export interface Dragon {
   position: number;
   direction: Direction;
+  balance?: GemBalance;
 }
 
 // Interface Level describes the level of the Smok game.
@@ -70,4 +121,6 @@ export interface Level {
   board: GadgetsOnBoard;
   toolbox: GadgetToolbox;
   dragon: Dragon;
+  // How many gems need to be laid on the scales for the gates to open.
+  goal: GemBalance;
 }
