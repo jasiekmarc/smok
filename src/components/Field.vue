@@ -8,12 +8,20 @@
     <span class="availability" v-if="field.availability !== undefined">{{
       field.availability
     }}</span>
-    <span class="gem" :class="`gem-${gemColour}`" v-if="hasGem">{{ gemOut }}</span>
+    <span class="gem" :class="`gem-${gemColour}`" v-if="hasGem">{{
+      gemOut
+    }}</span>
   </div>
 </template>
 <script lang="ts">
 import { State } from "@/game";
-import { Gadget, gadgetColourOut, gadgetDirection, GadgetInfo, gadgetType } from "@/level";
+import {
+  Gadget,
+  gadgetColourOut,
+  gadgetDirection,
+  GadgetInfo,
+  gadgetType,
+} from "@/level";
 import { Options, Vue } from "vue-class-component";
 
 // Represents a single field;
@@ -27,7 +35,7 @@ export interface ToolType {
   kind: "tool";
   gadget: Gadget;
   availability: number;
-};
+}
 
 @Options({
   props: {
@@ -49,7 +57,11 @@ export default class Field extends Vue {
     if (gadgetDirection(this.gadget) !== undefined) {
       classes.push(`rotate-${gadgetDirection(this.gadget)}`);
     }
-    if (this.field.kind === "tool" && this.field.availability !== undefined && this.field.availability > 0) {
+    if (
+      this.field.kind === "tool" &&
+      this.field.availability !== undefined &&
+      this.field.availability > 0
+    ) {
       classes.push("available");
     }
     if (this.gadget === "FINISH" && !this.state?.gateOpen) {

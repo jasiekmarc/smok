@@ -1,17 +1,22 @@
 <template>
-  <div
-    class="board"
-    :style="{ gridTemplateColumns: 'repeat(' + level.width + ', 100px)' }"
-  >
-    <Field
-      v-for="(field, i) in fields"
-      :key="i"
-      :id="i"
-      :field="field"
-      :state="state"
-      @drop="onToolDrop"
-      @dragover.prevent
-    />
+  <div class="row">
+    <div
+      class="board"
+      :style="{ gridTemplateColumns: 'repeat(' + level.width + ', 100px)' }"
+    >
+      <Field
+        v-for="(field, i) in fields"
+        :key="i"
+        :id="i"
+        :field="field"
+        :state="state"
+        @drop="onToolDrop"
+        @dragover.prevent
+      />
+    </div>
+    <div class="balance">
+      <Balance :level="level" :state="state" />
+    </div>
   </div>
   <button @click.prevent="startGame" v-if="ticker === undefined">▶</button>
   <button @click.prevent="haltGame" v-else>■</button>
@@ -29,8 +34,9 @@
 <script lang="ts">
 import { move, State } from "@/game";
 import { Gadget, GadgetToolbox, Level } from "@/level";
-import { Options, Vue } from "vue-class-component";
 import { reactive } from "vue";
+import { Options, Vue } from "vue-class-component";
+import Balance from "./Balance.vue";
 import Field, { FieldType, ToolType } from "./Field.vue";
 
 @Options({
@@ -39,6 +45,7 @@ import Field, { FieldType, ToolType } from "./Field.vue";
   },
   components: {
     Field,
+    Balance,
   },
   watch: {
     level: function () {
@@ -50,7 +57,7 @@ export default class Board extends Vue {
   level!: Level | undefined;
   fields: FieldType[] = [];
   toolbox: GadgetToolbox = {};
-  state: State | undefined = undefined;
+  state = {};
   ticker: number | undefined = 0;
 
   get size(): number {
@@ -170,13 +177,25 @@ export default class Board extends Vue {
   haltGame(): void {
     clearInterval(this.ticker);
     this.ticker = undefined;
-    (this.state as State).dragon = Object.assign({}, this.level?.dragon);
+    this.state = {
+      dragon: Object.assign({}, this.level?.dragon),
+      balance: {},
+      gateOpen: true,
+    };
   }
 }
 </script>
 <style lang="scss" scoped>
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .board {
-  display: grid;
+  display: inline-grid;
   gap: 5px;
   place-items: stretch;
   place-content: center;
@@ -184,6 +203,7 @@ export default class Board extends Vue {
 }
 
 button {
+  display: block;
   margin: 0.5em auto;
   padding: 10px 30px;
   border-radius: 15px;
