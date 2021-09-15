@@ -9,10 +9,16 @@
 export type Direction = "U" | "R" | "D" | "L";
 export type GemColour = "G" | "Y" | "K" | "R" | "B";
 
-export interface Arrow {
-  direction: Direction;
-}
-
+// Every Gadget corresponds to an unmodifiable element in the toolbox (i.e. an
+// arrow cannot be rotated before placing on the board, hence we have distinct
+// literals for each direction; A scale colour cannot be switched, so we have
+// distinct literal for every colour; Basket colours and amount can be switched,
+// so we have only one basket type). Gadget will be present in the level
+// definition. A gadget that is configurable will be accompanied with
+// GadgetAttributes.
+// 
+// GadgetType is a more general type that will simplify the implementation of
+// the engine.
 export type GadgetType = "ARROW" | "EMPTY" | "SCALE" | "BASKET" | "FINISH";
 export type Gadget =
   | "UPARROW"
