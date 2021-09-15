@@ -82,17 +82,16 @@ export default class Board extends Vue {
     let fields = new Array<FieldType>(this.size);
     for (let i = 0; i < this.size; i++) {
       fields[i] = {
+        kind: "field",
         gadget: "EMPTY",
         initial: false,
-      } as FieldType;
+      };
     }
 
     const positions = Object.keys(this.level.board).map(Number);
     positions.map((p) => {
-      fields[p] = Object.assign(
-        { initial: true },
-        this.level?.board[p]
-      ) as FieldType;
+      const fs = { kind: "field", initial: true } as FieldType;
+      fields[p] = Object.assign(fs, this.level?.board[p]);
     });
     this.fields = fields;
 
@@ -112,9 +111,10 @@ export default class Board extends Vue {
   get tools(): ToolType[] {
     return Object.entries(this.toolbox).map(([g, a]) => {
       return {
+        kind: "tool",
         gadget: g as Gadget,
         availability: a as number,
-      } as ToolType;
+      };
     });
   }
 

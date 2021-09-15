@@ -57,17 +57,33 @@ export default class Field extends Vue {
     if (gadgetDirection(this.gadget) !== undefined) {
       classes.push(`rotate-${gadgetDirection(this.gadget)}`);
     }
+
+    if (this.isDraggable) {
+      classes.push("draggable")
+    }
+
+    if (this.gadget === "FINISH" && !this.state?.gateOpen) {
+      classes.push("closed");
+    }
+    return classes;
+  }
+
+  get isDraggable(): boolean {
     if (
       this.field.kind === "tool" &&
       this.field.availability !== undefined &&
       this.field.availability > 0
     ) {
-      classes.push("available");
+      return true;
     }
-    if (this.gadget === "FINISH" && !this.state?.gateOpen) {
-      classes.push("closed");
+    if (
+      this.field.kind === "field" &&
+      this.field.gadget !== "EMPTY" &&
+      !this.field.initial
+    ) {
+      return true;
     }
-    return classes;
+    return false;
   }
 
   get gadget(): Gadget {
@@ -126,13 +142,13 @@ export default class Field extends Vue {
   font-weight: bold;
   color: var(--secondary-dark);
 
+  &.draggable:hover {
+    background: var(--primary-dark);
+  }
+
   &::before {
     display: inline-block;
   }
-}
-
-.available:hover {
-  background: var(--primary-dark);
 }
 
 .dragon {
