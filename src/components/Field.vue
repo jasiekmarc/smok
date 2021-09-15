@@ -206,12 +206,16 @@ export default class Field extends Vue {
 
 .gem {
   font-size: 20px;
+  font-weight: normal;
+  display: block;
   position: absolute;
   top: 5px;
   right: 5px;
+  color: #3f3f3f;
 }
 
 .gem::before {
+  font-size: 17px;
   content: "💎";
   color: rgba(0, 0, 0, 40%);
 }
@@ -241,6 +245,7 @@ export default class Field extends Vue {
   top: 5px;
   right: 5px;
   font-size: 20px;
+  font-weight: normal;
   color: #3f3f3f;
 }
 </style>

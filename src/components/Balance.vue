@@ -10,12 +10,12 @@
     </thead>
     <tbody>
       <tr v-for="col in allCols" :key="col">
-        <th
-          scope="row"
-          class="gem"
-          :class="`gem-${col}`"
-          style="position: relative"
-        ></th>
+        <th scope="row">
+          <div
+            class="gem"
+            :class="`gem-${col}`"
+          ></div>
+        </th>
         <td>{{ dragonGems(col) }}</td>
         <td>{{ scalesGems(col) }}</td>
         <td>{{ goalGems(col) }}</td>
@@ -68,6 +68,11 @@ table {
     padding: 0.75rem;
     vertical-align: top;
     border-top: 1px solid #dee2e6;
+
+    .gem {
+      position: unset;
+      vertical-align: top;
+    }
   }
 
   thead th {
