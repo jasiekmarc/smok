@@ -34,10 +34,18 @@ export default class App extends Vue {
 html {
   --primary: #dcedc8;
   --primary-dark: #aabb97;
-  --primary-light: #fffffb;
+  --primary-light: #f9fbe7;
   --secondary: #f8bbd0;
   --secondary-dark: #c48b9f;
   --secondary-light: #ffeeff;
+
+  --green: #689f38;
+  --yellow: #fdd835;
+  --black: #616161;
+  --red: #9a0007;
+  --blue: #006db3;
+
+  color: #3f3f3f;
 
   font-family: 
     // Cross-platform generic font family (default user interface font)

@@ -16,7 +16,7 @@ export type GemColour = "G" | "Y" | "K" | "R" | "B";
 // so we have only one basket type). Gadget will be present in the level
 // definition. A gadget that is configurable will be accompanied with
 // GadgetAttributes.
-// 
+//
 // GadgetType is a more general type that will simplify the implementation of
 // the engine.
 export type GadgetType = "ARROW" | "EMPTY" | "SCALE" | "BASKET" | "FINISH";
@@ -95,6 +95,19 @@ export function gadgetColourOut(gadget: Gadget): GemColour | undefined {
       return "B";
   }
   return undefined;
+}
+
+export function coloursInGame(level: Level): GemColour[] {
+  return Object.keys(level.goal) as GemColour[];
+}
+
+export function getDefaultAttributes(
+  gadget: Gadget,
+  cols: GemColour[] = []
+): GadgetAttributes | undefined {
+  if (gadget === "BASKET") {
+    return { colour: cols[0], count: 1 };
+  }
 }
 
 export type GadgetInfo = {

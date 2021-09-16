@@ -3,18 +3,15 @@
     <thead>
       <tr>
         <th></th>
-        <th scope="col">🐉</th>
-        <th scope="col">⚖️</th>
-        <th scope="col">🕳️</th>
+        <th scope="col"><span class="dragon"></span></th>
+        <th scope="col"><span class="scale"></span></th>
+        <th scope="col"><span class="finish"></span></th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="col in allCols" :key="col">
         <th scope="row">
-          <div
-            class="gem"
-            :class="`gem-${col}`"
-          ></div>
+          <div class="gem" :class="`gem-${col}`"></div>
         </th>
         <td>{{ dragonGems(col) }}</td>
         <td>{{ scalesGems(col) }}</td>

@@ -8,9 +8,13 @@
     <span class="availability" v-if="field.availability !== undefined">{{
       field.availability
     }}</span>
-    <span class="gem" :class="`gem-${gemColour}`" v-if="hasGem">{{
-      gemOut
-    }}</span>
+    <span v-if="hasGem" class="label gem" :class="`gem-${gemColour}`"></span>
+    <span
+      v-if="gemCount !== undefined"
+      class="label gem-count"
+      :class="`gem-${gemCount}`"
+      >+ {{ gemCount }}</span
+    >
   </div>
 </template>
 <script lang="ts">
@@ -59,7 +63,7 @@ export default class Field extends Vue {
     }
 
     if (this.isDraggable) {
-      classes.push("draggable")
+      classes.push("draggable");
     }
 
     if (this.gadget === "FINISH" && !this.state?.gateOpen) {
@@ -101,7 +105,8 @@ export default class Field extends Vue {
     return ["SCALE", "BASKET"].includes(gadgetType(this.gadget));
   }
 
-  get gemOut(): number | string | undefined {
+  // First element are CSS classes. The second is amount.
+  get gemCount(): string | number | undefined {
     if (this.field.kind === "tool") {
       return undefined;
     }
@@ -112,13 +117,13 @@ export default class Field extends Vue {
   }
 
   get gemColour(): string | undefined {
-    if (this.field.kind === "tool") {
-      return undefined;
-    }
+    // if (this.field.kind === "tool") {
+    //   return undefined;
+    // }
     if (gadgetType(this.gadget) === "SCALE") {
       return gadgetColourOut(this.gadget);
     }
-    if (gadgetType(this.gadget) === "BASKET") {
+    if (this.field.kind === "field" && gadgetType(this.gadget) === "BASKET") {
       return this.field.attributes?.colour;
     }
     return undefined;
@@ -126,6 +131,12 @@ export default class Field extends Vue {
 }
 </script>
 <style lang="scss">
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+// @import "~@fortawesome/fontawesome-free/scss/regular.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+
 .field {
   border: 1px var(--primary-dark) solid;
   background: var(--primary);
@@ -134,42 +145,72 @@ export default class Field extends Vue {
 
   // Center horizontally and vertically.
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
 
   position: relative;
   font-size: 50px;
-  font-weight: bold;
-  color: var(--secondary-dark);
 
   &.draggable:hover {
     background: var(--primary-dark);
   }
 
   &::before {
-    display: inline-block;
+    @extend %fa-icon;
+    @extend .fas;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dragon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .label {
+    width: 20px;
+    height: 20px;
+
+    z-index: 1;
+
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: radial-gradient(rgba(0, 0, 0, 50%), transparent);
   }
 }
 
+/* Global styles for element */
 .dragon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @extend %fa-icon;
+  @extend .fas;
 
   &::before {
-    display: inline-block;
-    content: "🐉";
+    content: "\f6d5";
+    color: var(--green);
   }
 }
 
 .arrow::before {
-  content: "⇽";
+  content: "\f061";
+  color: var(--secondary-dark);
 }
 
 .empty::before {
@@ -192,52 +233,46 @@ export default class Field extends Vue {
   content: "🧺";
 }
 
-.rotate-R::before {
+.rotate-L::before {
   transform: scaleX(-1);
 }
 
 .rotate-D::before {
-  transform: rotate(-90deg);
-}
-
-.rotate-U::before {
   transform: rotate(90deg);
 }
 
+.rotate-U::before {
+  transform: rotate(-90deg);
+}
+
 .gem {
-  font-size: 20px;
-  font-weight: normal;
-  display: block;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  color: #3f3f3f;
+  &::before {
+    @extend %fa-icon;
+    @extend .fas;
+    font-weight: normal;
+    font-size: 17px;
+    content: "\f3a5";
+  }
 }
 
-.gem::before {
-  font-size: 17px;
-  content: "💎";
-  color: rgba(0, 0, 0, 40%);
+.gem-G {
+  color: var(--green);
 }
 
-.gem-G::before {
-  text-shadow: 0 0 0 green;
+.gem-Y {
+  color: var(--yellow);
 }
 
-.gem-Y::before {
-  text-shadow: 0 0 0 yellow;
+.gem-K {
+  color: var(--black);
 }
 
-.gem-K::before {
-  text-shadow: 0 0 0 black;
+.gem-R {
+  color: var(--red);
 }
 
-.gem-R::before {
-  text-shadow: 0 0 0 red;
-}
-
-.gem-B::before {
-  text-shadow: 0 0 0 blue;
+.gem-B {
+  color: var(--blue);
 }
 
 .availability {
@@ -246,6 +281,5 @@ export default class Field extends Vue {
   right: 5px;
   font-size: 20px;
   font-weight: normal;
-  color: #3f3f3f;
 }
 </style>

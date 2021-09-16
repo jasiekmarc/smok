@@ -10,14 +10,22 @@
         :id="i"
         :field="field"
         :state="state"
-        @drop="onToolDrop"
+        @drop.prevent="onToolDrop"
         @dragover.prevent
+        @click="field.attributes !== undefined && openSettings(i)"
       />
     </div>
     <div class="balance">
       <Balance :level="level" :state="state" />
     </div>
   </div>
+  <component
+    v-if="currentSettings !== undefined"
+    :is="currentSettingsComponent"
+    v-model:attributes="fields[currentSettings].attributes"
+    :allCols="allCols"
+    v-on:close="closeSettings"
+  ></component>
   <button @click.prevent="startGame" v-if="ticker === undefined">▶</button>
   <button @click.prevent="haltGame" v-else>■</button>
   <div class="toolbox">
@@ -33,11 +41,19 @@
 </template>
 <script lang="ts">
 import { move, State } from "@/game";
-import { Gadget, GadgetToolbox, Level } from "@/level";
+import {
+  coloursInGame,
+  Gadget,
+  GadgetToolbox,
+  GemColour,
+  getDefaultAttributes,
+  Level,
+} from "@/level";
 import { reactive } from "vue";
 import { Options, Vue } from "vue-class-component";
 import Balance from "./Balance.vue";
 import Field, { FieldType, ToolType } from "./Field.vue";
+import BasketSettings from "./field-settings/BasketSettings.vue";
 
 @Options({
   props: {
@@ -46,6 +62,7 @@ import Field, { FieldType, ToolType } from "./Field.vue";
   components: {
     Field,
     Balance,
+    BasketSettings,
   },
   watch: {
     level: function () {
@@ -59,6 +76,28 @@ export default class Board extends Vue {
   toolbox: GadgetToolbox = {};
   state = {};
   ticker: number | undefined = 0;
+  allCols: GemColour[] = [];
+
+  currentSettings: number | undefined = 0;
+
+  openSettings(i: number): void {
+    this.currentSettings = i;
+  }
+
+  closeSettings(): void {
+    this.currentSettings = undefined;
+  }
+
+  get currentSettingsComponent(): string {
+    if (this.currentSettings === undefined) {
+      return "";
+    }
+    const gadget = this.fields[this.currentSettings].gadget;
+    const gadgetCapitalised = gadget.charAt(0) + gadget.slice(1).toLowerCase();
+    const componentName = `${gadgetCapitalised}Settings`;
+
+    return componentName;
+  }
 
   get size(): number {
     if (this.level === undefined) {
@@ -67,9 +106,10 @@ export default class Board extends Vue {
     return this.level.width * this.level.height;
   }
 
-  mounted(): void {
+  created(): void {
     this.populateLevel();
     this.ticker = undefined;
+    this.currentSettings = undefined;
   }
 
   // Scans the level prop and builds a new board. Triggered everytime `level`
@@ -105,6 +145,8 @@ export default class Board extends Vue {
       balance: {},
       gateOpen: true,
     });
+
+    this.allCols = coloursInGame(this.level);
   }
 
   // Current state of the toolbox.
@@ -150,6 +192,10 @@ export default class Board extends Vue {
     (this.toolbox[currentGadget] as number) += 1;
     // Move the tool to the field.
     this.fields[fieldNum].gadget = tool as Gadget;
+    this.fields[fieldNum].attributes = getDefaultAttributes(
+      tool as Gadget,
+      this.allCols
+    );
     // Remove it from the toolbox.
     (this.toolbox[tool as Gadget] as number) -= 1;
   }
@@ -188,7 +234,7 @@ export default class Board extends Vue {
 <style lang="scss" scoped>
 .row {
   display: flex;
-  gap: 10px;
+  gap: 1rem;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
@@ -196,7 +242,7 @@ export default class Board extends Vue {
 
 .board {
   display: inline-grid;
-  gap: 5px;
+  gap: 0.25rem;
   place-items: stretch;
   place-content: center;
   grid-auto-rows: 100px;
@@ -204,10 +250,11 @@ export default class Board extends Vue {
 
 button {
   display: block;
-  margin: 0.5em auto;
-  padding: 10px 30px;
-  border-radius: 15px;
-  border: 5px solid var(--primary-light);
+  margin: 1rem auto;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  border: none;
   background: var(--primary-dark);
   font-size: 30px;
   &:hover {
@@ -219,7 +266,7 @@ button {
   margin: 1em auto;
   max-width: min(768px, 90vh);
   display: grid;
-  gap: 5px;
+  gap: 0.25rem;
   grid-template-columns: repeat(auto-fit, 100px);
   justify-content: center;
 }

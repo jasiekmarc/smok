@@ -4,11 +4,13 @@
   "dragon": { "position": 5, "direction": "R" },
   "toolbox": {
     "LEFTARROW": 1,
-    "DOWNARROW": 1,
-    "BASKET": 1,
-    "YSCALE": 1
+    "UPARROW": 1,
+    "RIGHTARROW": 1,
+    "DOWNARROW": 2
   },
   "board": {
+    "4": { "gadget": "YSCALE" },
+    "8": { "gadget": "BASKET", "attributes": { "colour": "Y", "count": 1 } },
     "14": { "gadget": "FINISH" }
   },
   "goal": {
