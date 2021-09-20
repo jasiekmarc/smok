@@ -12,7 +12,9 @@
         :state="state"
         @drop.prevent="onToolDrop"
         @dragover.prevent
-        @click="field.attributes !== undefined && openSettings(i)"
+        @click="
+          field.attributes !== undefined && !field.initial && openSettings(i)
+        "
       />
     </div>
     <div class="balance">
