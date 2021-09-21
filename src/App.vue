@@ -1,32 +1,22 @@
 <template>
-  <Board :level="level" />
+  <board :level="level" v-if="level !== null" />
+  <level-loader v-model:level="level" />
 </template>
 
 <script lang="ts">
-import Ajv from "ajv";
 import { Options, Vue } from "vue-class-component";
-import exampleLevel from "./assets/level.json";
 import Board from "./components/Board.vue";
+import LevelLoader from "./components/LevelLoader.vue";
 import { Level } from "./level";
-import levelSchema from "./level.schema.json";
 
 @Options({
   components: {
     Board,
+    LevelLoader,
   },
 })
 export default class App extends Vue {
-  level: Level | undefined = undefined;
-  beforeMount(): void {
-    const ajv = new Ajv();
-    const validate = ajv.compile(levelSchema);
-    const valid = validate(exampleLevel);
-    if (!valid) {
-      // TODO: Handle parsing error.
-      return;
-    }
-    this.level = exampleLevel as Level;
-  }
+  level: Level | null = null;
 }
 </script>
 

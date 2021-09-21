@@ -22,13 +22,13 @@
     </div>
   </div>
   <component
-    v-if="currentSettings !== undefined"
+    v-if="currentSettings !== null"
     :is="currentSettingsComponent"
     v-model:attributes="fields[currentSettings].attributes"
     :allCols="allCols"
     v-on:close="closeSettings"
   ></component>
-  <button @click.prevent="startGame" v-if="ticker === undefined">▶</button>
+  <button @click.prevent="startGame" v-if="ticker === null">▶</button>
   <button @click.prevent="haltGame" v-else>■</button>
   <div class="toolbox">
     <Field
@@ -73,25 +73,25 @@ import BasketSettings from "./field-settings/BasketSettings.vue";
   },
 })
 export default class Board extends Vue {
-  level!: Level | undefined;
+  level!: Level | null;
   fields: FieldType[] = [];
   toolbox: GadgetToolbox = {};
   state = {};
-  ticker: number | undefined = 0;
+  ticker: number | null = null;
   allCols: GemColour[] = [];
 
-  currentSettings: number | undefined = 0;
+  currentSettings: number | null = null;
 
   openSettings(i: number): void {
     this.currentSettings = i;
   }
 
   closeSettings(): void {
-    this.currentSettings = undefined;
+    this.currentSettings = null;
   }
 
   get currentSettingsComponent(): string {
-    if (this.currentSettings === undefined) {
+    if (this.currentSettings === null) {
       return "";
     }
     const gadget = this.fields[this.currentSettings].gadget;
@@ -102,7 +102,7 @@ export default class Board extends Vue {
   }
 
   get size(): number {
-    if (this.level === undefined) {
+    if (this.level === null) {
       return 0;
     }
     return this.level.width * this.level.height;
@@ -110,14 +110,12 @@ export default class Board extends Vue {
 
   created(): void {
     this.populateLevel();
-    this.ticker = undefined;
-    this.currentSettings = undefined;
   }
 
   // Scans the level prop and builds a new board. Triggered everytime `level`
   // changes.
   populateLevel(): void {
-    if (this.level === undefined) {
+    if (this.level === null) {
       return;
     }
     // Populate fields with initial gadgets from the level.
@@ -175,7 +173,7 @@ export default class Board extends Vue {
   // Triggered when a tool is dropped onto the board.
   onToolDrop(event: DragEvent): void {
     const tool = event.dataTransfer?.getData("text");
-    if (tool === undefined) {
+    if (tool === null) {
       return;
     }
     const dropElement = (event.target as Element).closest(
@@ -219,12 +217,12 @@ export default class Board extends Vue {
 
   // Stops/pauses the game.
   stopGame(): void {
-    clearInterval(this.ticker);
+    clearInterval(this.ticker || undefined);
   }
 
   haltGame(): void {
-    clearInterval(this.ticker);
-    this.ticker = undefined;
+    clearInterval(this.ticker || undefined);
+    this.ticker = null;
     this.state = {
       dragon: Object.assign({}, this.level?.dragon),
       balance: {},
